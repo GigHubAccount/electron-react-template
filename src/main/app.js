@@ -1,73 +1,89 @@
-/*
- * @Author: JC96821 13478707150@163.com
- * @Date: 2023-09-02 13:13:05
- * @LastEditors: WIN-J7OL7MK489U\EDY 13478707150@163.com
- * @LastEditTime: 2023-10-07 11:19:42
- * @FilePath: \app\app.js
- * @Description: electron 入口文件
- */
+const { app, BrowserWindow, Notification, ipcMain } = require("electron");
+const path = require("path");
+const url = require("url");
+const { exec } = require("child_process");
 
-const { app, BrowserWindow } = require('electron');
-const path = require('path');
+const preloadPath = path.resolve(__dirname, "../../public/loading.html");
 
-const AppGenerator = require('./process/appGgenerator');
-const coreMiddleWare = require('./middleware/coreMiddleWare');
-// const createProxyService = require('./process/createProxyService');
-const eventMiddleWare = require('./middleware/eventMiddleWare');
-const commandMiddleWare = require('./middleware/commandMiddleWare');
-const selftStartMiddleWare = require('./middleware/selfStartMiddleWare');
-const { getClientEnvironment, getLocalIpAddress } = require('./middleware/utils');
+let mainWindow;
 
-const isDev = !app.isPackaged;
-const env = getClientEnvironment(isDev);
-const host = getLocalIpAddress() || 'localhost';
-const PORT = env.PORT || 3000;
-const preloadPath = path.resolve(__dirname, '../../public/loading.html');
-const prodPath = `file://${path.resolve(__dirname, '../../build/index.html')}`;
-
-const createMainWindow = () => {
-    // 创建主窗口
-    const mainWindow = new BrowserWindow({
-        title: 'electron-react-template',
-        icon: path.join(__dirname, './public/favicon.ico'),
+function createWindow() {
+    // mainWindow = new BrowserWindow({
+    //   width: 800,
+    //   height: 600,
+    //   webPreferences: {
+    //     nodeIntegration: true
+    //   }
+    // });
+    mainWindow = new BrowserWindow({
+        title: "项目名称",
+        // icon: path.join(__dirname, "./public/favicon.ico"),
         width: 1348,
         minWidth: 1082,
         height: 838,
         minHeight: 686,
         frame: false,
         webPreferences: {
-            preload: path.join(__dirname, './process/preload.js'),
+            preload: path.join(__dirname, "./process/preload.js"),
             nodeIntegration: true,
             contextIsolation: false,
-            contentSecurityPolicy: "default-src 'self'"
-        }
+            contentSecurityPolicy: "default-src 'self'",
+        },
     });
-    // 加载app内容
-    isDev ? mainWindow.loadFile(preloadPath) : mainWindow.loadURL(prodPath);
-    return mainWindow;
-};
+    mainWindow.loadFile(preloadPath);
+    mainWindow.webContents.loadURL(`http://localhost:3000/index`);
 
-app.whenReady().then(() => {
-    const win = createMainWindow();
-    const $app = AppGenerator.getInstance({
-        win,
-        isDev,
-        port: PORT,
-        host
+    mainWindow.webContents.openDevTools();
+
+    // mainWindow.loadURL(
+    //   url.format({
+    //     pathname: path.join(__dirname, 'index.html'),
+    //     protocol: 'file:',
+    //     slashes: true
+    //   })
+    // );
+
+    mainWindow.on("closed", function () {
+        mainWindow = null;
     });
-    // 基础&核心功能注册
-    $app.use(coreMiddleWare);
-    // 注册事件
-    $app.use(eventMiddleWare);
-    if (isDev) {
-        // 注册快捷键
-        $app.use(commandMiddleWare);
-        // 自启动 & 热更新模块
-        $app.use(selftStartMiddleWare);
-        // 开启网关代理
-        // $app.use(createProxyService);
-        // 默认打开控制台
-        win.webContents.openDevTools();
+}
+
+app.on("ready", createWindow);
+
+app.on("window-all-closed", function () {
+    if (process.platform !== "darwin") {
+        app.quit();
     }
-    $app.exec();
+});
+
+app.on("activate", function () {
+    if (mainWindow === null) {
+        createWindow();
+    }
+});
+
+// app.on("notification", function () {
+//     console.log(123456);
+//     // new Notification({
+//     //     title: "info",
+//     //     body: "123456",
+//     // }).show();
+//     mainWindow.hide();
+// });
+
+ipcMain.on("runExe", (event, exePath) => {
+    console.log(123456);
+
+    // 执行 exe 文件
+    exec(exePath, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`执行错误: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.error(`执行警告: ${stderr}`);
+            return;
+        }
+        console.log(`执行成功: ${stdout}`);
+    });
 });

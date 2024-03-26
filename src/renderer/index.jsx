@@ -6,31 +6,18 @@
  * @FilePath: \electron-react-template\src\index.js
  * @Description: 客户端程序入口
  */
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { HashRouter } from 'react-router-dom';
+import React from "react";
+import ReactDOM from "react-dom/client";
 
-import PrimaryLayout from './layout/primary-layout';
-import { ConfigProvider as AntdConfigProvider, theme } from 'antd';
-import { initAppData } from './utils';
+import ShowImage from "./components/showImage";
 
-import themeColors from './style/themeColors';
-
-import './index.less';
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
-    <React.StrictMode>
-        <HashRouter>
-            <AntdConfigProvider theme={{token: themeColors, algorithm: theme.darkAlgorithm}}>
-                <PrimaryLayout />
-            </AntdConfigProvider>
-        </HashRouter>
-    </React.StrictMode>
+    <div>
+        <ShowImage />
+    </div>
 );
-
-initAppData();
 
 // Webpack Hot Module Replacement API
 if (module?.hot) {
