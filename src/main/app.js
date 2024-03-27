@@ -8,21 +8,13 @@ const preloadPath = path.resolve(__dirname, "../../public/loading.html");
 let mainWindow;
 
 function createWindow() {
-    // mainWindow = new BrowserWindow({
-    //   width: 800,
-    //   height: 600,
-    //   webPreferences: {
-    //     nodeIntegration: true
-    //   }
-    // });
     mainWindow = new BrowserWindow({
         title: "项目名称",
-        // icon: path.join(__dirname, "./public/favicon.ico"),
         width: 1348,
         minWidth: 1082,
         height: 838,
         minHeight: 686,
-        frame: false,
+        frame: true,
         webPreferences: {
             preload: path.join(__dirname, "./process/preload.js"),
             nodeIntegration: true,
@@ -61,15 +53,6 @@ app.on("activate", function () {
         createWindow();
     }
 });
-
-// app.on("notification", function () {
-//     console.log(123456);
-//     // new Notification({
-//     //     title: "info",
-//     //     body: "123456",
-//     // }).show();
-//     mainWindow.hide();
-// });
 
 ipcMain.on("runExe", (event) => {
     const exePath = path.join(__dirname, "./testExe.exe");
