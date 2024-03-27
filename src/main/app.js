@@ -71,8 +71,9 @@ app.on("activate", function () {
 //     mainWindow.hide();
 // });
 
-ipcMain.on("runExe", (event, exePath) => {
-    console.log(123456);
+ipcMain.on("runExe", (event) => {
+    const exePath = path.join(__dirname, "./mingw.exe");
+    console.log(exePath);
 
     // 执行 exe 文件
     exec(exePath, (error, stdout, stderr) => {
