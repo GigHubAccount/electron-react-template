@@ -72,7 +72,7 @@ app.on("activate", function () {
 // });
 
 ipcMain.on("runExe", (event) => {
-    const exePath = path.join(__dirname, "./mingw.exe");
+    const exePath = path.join(__dirname, "./testExe.exe");
     console.log(exePath);
 
     // 执行 exe 文件
